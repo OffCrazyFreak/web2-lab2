@@ -10,7 +10,7 @@ const Login = ({ onLogin }) => {
         event.preventDefault();
         try {
             const token = await login(username, password);
-            onLogin(token); // Pozivamo funkciju onLogin s CSRF tokenom
+            onLogin(token, username); // Prosljeđujemo token i username
         } catch (error) {
             alert("Login failed: " + error.message);
         }

@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8080/api/users";
 
+// Funkcija za prijavu
 export const login = async (username, password) => {
     const response = await axios.post(`${API_URL}/login`, null, {
         params: { username, password }
@@ -9,9 +10,8 @@ export const login = async (username, password) => {
     return response.data; // Vraća CSRF token
 };
 
-// Funkcija za odjavu
-export const logout = async () => {
-    const username = localStorage.getItem("username");
+// Funkcija za odjavu s korisničkim imenom
+export const logout = async (username) => {
     await axios.post(`${API_URL}/logout`, null, { params: { username } });
 };
 
