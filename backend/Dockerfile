@@ -26,10 +26,10 @@ FROM openjdk:17-slim
 WORKDIR /app
 
 # Copy the built JAR file from the builder stage
-COPY --from=builder /app/target/restorative-practices-creative-cluster-1.0.0.jar ./restorative-practices-creative-cluster-1.0.0.jar
+COPY --from=builder /app/target/security-1.jar ./security-1.jar
 
 # Expose the application's port
 EXPOSE 8080
 
 # Set the entrypoint command to run the application
-ENTRYPOINT ["java", "-jar", "restorative-practices-creative-cluster-1.0.0.jar"]
+ENTRYPOINT ["java", "-jar", "security-1.jar"]
