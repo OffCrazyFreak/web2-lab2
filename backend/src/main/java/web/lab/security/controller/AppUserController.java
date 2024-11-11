@@ -11,7 +11,11 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/users")
 public class AppUserController {
@@ -22,7 +26,8 @@ public class AppUserController {
     @Autowired
     private AppUserRepository appUserRepository;
 
-    // Endpoint ranjiv na SQL Injection
+    private final ConcurrentHashMap<String, String> csrfTokens = new ConcurrentHashMap<>();
+
     @GetMapping("/injection")
     public List<AppUser> vulnerableSearch(@RequestParam String username) throws Exception {
         List<AppUser> users = new ArrayList<>();
@@ -42,7 +47,6 @@ public class AppUserController {
         return users;
     }
 
-    // Sigurni endpoint koji štiti od SQL Injectiona
     @GetMapping
     public List<AppUser> secureSearch(@RequestParam String username) {
         return appUserRepository.findByUsername(username);
@@ -55,14 +59,48 @@ public class AppUserController {
         return "User added successfully";
     }
 
-    // Endpoint za ažuriranje lozinke koristeći PUT mapping na glavnoj ruti
+    @PostMapping("/login")
+    public String login(@RequestParam String username, @RequestParam String password) {
+        Optional<AppUser> optionalUser = appUserRepository.findByUsername(username).stream().findFirst();
+        String hashedPassword = String.valueOf(password.hashCode());
 
-    @GetMapping("/password")
-    public String updatePassword(@RequestParam Long id, @RequestParam String newPassword) {
-        AppUser user = appUserRepository.findById(id)
+        if (optionalUser.isEmpty() || !optionalUser.get().getPassword().equals(hashedPassword)) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        String csrfToken = UUID.randomUUID().toString();
+        csrfTokens.put(username, csrfToken);
+
+        return csrfToken;
+    }
+
+    @PostMapping("/logout")
+    public String logout(@RequestParam String username) {
+        csrfTokens.remove(username);
+        return "User logged out successfully";
+    }
+
+    @GetMapping("/change-data-csrf")
+    public String updateUsernameCSRF(@RequestParam String username, @RequestParam String newUsername, @RequestParam String token) {
+        String storedToken = csrfTokens.get(username);
+        if (storedToken == null || !storedToken.equals(token)) {
+            throw new RuntimeException("Invalid CSRF token");
+        }
+
+        AppUser user = appUserRepository.findByUsername(username).stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setPassword(newPassword);
+        user.setUsername(newUsername);
         appUserRepository.save(user);
-        return "Password updated successfully";
+
+        return "Username updated successfully";
+    }
+
+    @GetMapping("/change-data")
+    public String updateUsername(@RequestParam String username, @RequestParam String newUsername) {
+        AppUser user = appUserRepository.findByUsername(username).stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setUsername(newUsername);
+        appUserRepository.save(user);
+        return "Username updated successfully";
     }
 }
