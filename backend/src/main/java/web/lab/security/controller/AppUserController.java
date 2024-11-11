@@ -59,7 +59,8 @@ public class AppUserController {
 
     @GetMapping("/password")
     public String updatePassword(@RequestParam Long id, @RequestParam String newPassword) {
-        AppUser user = appUserRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        AppUser user = appUserRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPassword(newPassword);
         appUserRepository.save(user);
         return "Password updated successfully";
