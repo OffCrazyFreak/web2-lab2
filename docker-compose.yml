@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  web2lab2-postgres:
+    image: postgres:15.5-alpine3.18
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - web2lab2-postgres-data:/var/lib/postgresql/data
+    networks:
+      - web2lab2-network
+      
+
+  web2lab2-backend:
+    build:
+      context: Backend
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - web2lab2-postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://web2lab2-postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - web2lab2-network
+
+volumes:
+  web2lab2-postgres-data:
+
+networks:
+  web2lab2-network:
+    driver: bridge
