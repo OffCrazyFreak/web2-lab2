@@ -16,7 +16,7 @@ services:
 
   web2lab2-backend:
     build:
-      context: Backend
+      context: backend
     restart: always
     ports:
       - "8081:8080"
