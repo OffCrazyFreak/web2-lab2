@@ -1,24 +1,30 @@
 import React, { useState } from "react";
 import { Button, TextField, Box, Typography } from "@mui/material";
-import { login } from "../services/api";
+import { addUser } from "../services/api";
 
-export function Login({ onLogin }) {
+export function AddUserForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleLogin(event) {
+  function handleSubmit(event) {
     event.preventDefault();
-    login(username, password)
-      .then((token) => onLogin(token, username))
-      .catch((error) => alert("Login failed: " + error.message));
+    addUser(username, password)
+      .then(() => {
+        alert("User added successfully");
+        setUsername("");
+        setPassword("");
+      })
+      .catch((error) => {
+        alert("Failed to add user: " + error.message);
+      });
   }
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: 500, mx: "auto", mt: 5 }}>
       <Typography variant="h5" gutterBottom>
-        Login
+        Add New User
       </Typography>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleSubmit}>
         <TextField
           label="Username"
           fullWidth
@@ -35,7 +41,7 @@ export function Login({ onLogin }) {
           margin="normal"
         />
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Login
+          Add User
         </Button>
       </form>
     </Box>
