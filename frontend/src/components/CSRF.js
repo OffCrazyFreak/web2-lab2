@@ -57,9 +57,6 @@ export function CSRF() {
       {useCsrf && (
         <>
           <hr />
-          <Typography variant="h5" gutterBottom>
-            Login
-          </Typography>
           {isLoggedIn ? (
             <Button
               onClick={handleLogout}
