@@ -2,7 +2,6 @@
 
 # Configuration
 REACT_APP_DIR="./frontend"
-DOCKER_COMPOSE_FILE="./docker-compose.yml"
 
 # Find the Nginx config file (assuming only one file matches the pattern)
 NGINX_CONF_FILE=$(find . -maxdepth 1 -name "nginx-*.conf" -print -quit)
@@ -35,7 +34,7 @@ else
 fi
 
 # Build the React application
-echo "Building React application..."
+echo "Building Vite application..."
 cd $REACT_APP_DIR
 npm install
 npm run build
@@ -51,7 +50,7 @@ cd - > /dev/null
 # Create the app directory in Nginx's html folder and copy build files
 echo "Deploying the app to Nginx..."
 sudo mkdir -p $NGINX_HTML_DIR
-sudo cp -r $REACT_APP_DIR/build/* $NGINX_HTML_DIR/
+sudo cp -r $REACT_APP_DIR/dist/* $NGINX_HTML_DIR/
 
 # Run Docker Compose for PostgreSQL and Backend
 echo "Starting Docker services..."
